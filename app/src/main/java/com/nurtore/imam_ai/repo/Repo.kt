@@ -2,6 +2,7 @@ package com.nurtore.imam_ai.repo
 
 import com.nurtore.imam_ai.api.RetrofitInstance
 import com.nurtore.imam_ai.model.MessageWithImam
+import com.nurtore.imam_ai.model.Question
 
 class Repo {
 
@@ -9,8 +10,8 @@ class Repo {
         return RetrofitInstance.api.getChatId()
     }
 
-    suspend fun messageImam(chatId: String): String {
-        return RetrofitInstance.api.messageImam(chatId)
+    suspend fun messageImam(chatId: String, question: Question): String {
+        return RetrofitInstance.api.messageImam(chatId, question)
     }
 
     suspend fun getMessagesList(chatId: String): List<MessageWithImam> {

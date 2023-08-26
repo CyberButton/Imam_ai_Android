@@ -1,6 +1,7 @@
 package com.nurtore.imam_ai.api
 
 import com.nurtore.imam_ai.model.MessageWithImam
+import com.nurtore.imam_ai.model.Question
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -11,10 +12,10 @@ interface ImamAIAPI {
     @GET("messages/en/new")
     suspend fun getChatId(): String
 
-    @POST("messages/64e90de128bce87b8d7a86dc")
+    @POST("messages/{chat_id}")
     suspend fun messageImam(
-        //@Path("chat_id") chatId: String,
-        @Body question: String
+        @Path("chat_id") chatId: String,
+        @Body question: Question
     ): String
 
     @GET("messages/{chat_id}")
