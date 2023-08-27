@@ -174,7 +174,7 @@ fun ChatMessage(
                 )
             )
             .background(
-                if (message.sentByImam()) Color.Blue else Color.Cyan
+                if (message.sentByImam()) Color.LightGray else Color.Cyan
             )
             .padding(16.dp)
     ) {

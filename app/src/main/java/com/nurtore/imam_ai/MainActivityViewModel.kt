@@ -4,12 +4,16 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nurtore.imam_ai.model.DbMessageWithImam
 import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.model.Question
 import com.nurtore.imam_ai.repo.Repo
 import kotlinx.coroutines.launch
 
-class MainActivityViewModel(private val repo: Repo): ViewModel() {
+class MainActivityViewModel(
+    private val repo: Repo,
+    private val dao: DbMessageWithImamDao
+): ViewModel() {
 
     // private mutable list so that it cant be modified from other places
     @SuppressLint("MutableCollectionMutableState")
@@ -17,7 +21,7 @@ class MainActivityViewModel(private val repo: Repo): ViewModel() {
 
     val messagesList: List<MessageWithImam> = _messagesList
 
-//    private var x = 0;
+    private var x = 0;
 //    fun sendMessage() {
 //        println("pressed")
 //        _messagesList.add("button pressed bro" + x)
@@ -40,7 +44,11 @@ class MainActivityViewModel(private val repo: Repo): ViewModel() {
             println(question)
             val response: String = repo.messageImam("64e90de128bce87b8d7a86dc", Question(question))
             println(response)
+            _messagesList.add(MessageWithImam("user", question))
+            dao.addMessage(DbMessageWithImam(++x,"user", question))
+
             _messagesList.add(MessageWithImam("assistant", response))
+            dao.addMessage(DbMessageWithImam(++x,"assistant", response))
             println("call successful")
         }
     }
