@@ -43,9 +43,19 @@ import androidx.compose.material3.TextField
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import androidx.room.Room
 import com.nurtore.imam_ai.model.MessageWithImam
 
 class MainActivity : ComponentActivity() {
+
+    private val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            DbMessageWithImamDatabase::class.java,
+            "messages.db"
+        ).build()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -53,7 +63,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
 
                 val repo = Repo()
-                val viewModelFactory = MainViewModelFactory(repo)
+                val viewModelFactory = MainViewModelFactory(repo, db.dao)
                 val viewmodel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
 
                 val messagesList = viewmodel.messagesList
