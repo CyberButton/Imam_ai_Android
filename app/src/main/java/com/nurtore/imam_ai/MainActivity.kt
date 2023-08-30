@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.room.Room
 import com.nurtore.imam_ai.model.MessageWithImam
+import kotlinx.coroutines.coroutineScope
 
 class MainActivity : ComponentActivity() {
 
@@ -65,8 +66,9 @@ class MainActivity : ComponentActivity() {
                 val repo = Repo()
                 val viewModelFactory = MainViewModelFactory(repo, db.dao)
                 val viewmodel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
-
                 val messagesList = viewmodel.messagesList
+                //viewmodel.deleteAllMessages()
+                viewmodel.initializeMessagesList()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

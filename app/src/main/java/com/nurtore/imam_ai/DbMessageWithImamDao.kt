@@ -11,8 +11,8 @@ interface DbMessageWithImamDao {
     @Insert
     suspend fun addMessage(dbMessageWithImam: DbMessageWithImam)
 
-//    @Delete
-//    suspend fun deleteAllMessages()
+    @Query("DELETE FROM dbmessagewithimam")
+    suspend fun deleteAllMessages()
 
     //can return Flow<> or LiveData<> to observe changes in db
     // ascending order

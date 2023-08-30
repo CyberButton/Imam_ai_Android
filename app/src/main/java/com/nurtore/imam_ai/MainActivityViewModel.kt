@@ -2,13 +2,18 @@ package com.nurtore.imam_ai
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nurtore.imam_ai.model.DbMessageWithImam
 import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.model.Question
 import com.nurtore.imam_ai.repo.Repo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivityViewModel(
     private val repo: Repo,
@@ -18,8 +23,20 @@ class MainActivityViewModel(
     // private mutable list so that it cant be modified from other places
     @SuppressLint("MutableCollectionMutableState")
     private var _messagesList = mutableStateListOf<MessageWithImam>()
-
     val messagesList: List<MessageWithImam> = _messagesList
+
+    fun initializeMessagesList() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val messages = dao.getMessagesOrderedBySequence().map { it ->
+                MessageWithImam(it.role, it.content)
+            }
+
+            withContext(Dispatchers.Main) {
+                _messagesList.clear() // Clear the existing list
+                _messagesList.addAll(messages) // Add the mapped messages
+            }
+        }
+    }
 
     private var x = 0;
 //    fun sendMessage() {
@@ -38,6 +55,11 @@ class MainActivityViewModel(
 //            _messagesList.add(response)
 //        }
 //    }
+    fun deleteAllMessages() {
+        CoroutineScope(Dispatchers.IO).launch {
+            dao.deleteAllMessages()
+        }
+    }
 
     fun messageImam(question: String) {
         viewModelScope.launch {
