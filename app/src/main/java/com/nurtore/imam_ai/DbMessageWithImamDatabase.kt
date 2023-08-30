@@ -6,7 +6,8 @@ import com.nurtore.imam_ai.model.DbMessageWithImam
 
 @Database(
     entities = [DbMessageWithImam::class],
-    version = 1
+    version = 1 // possible to change schema in future, increment this value and add auto-migration
+    //https://www.youtube.com/watch?v=hrJZIF7qSSw&t=1s&ab_channel=PhilippLackner
 )
 abstract class DbMessageWithImamDatabase:RoomDatabase() {
 

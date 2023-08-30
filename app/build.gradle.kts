@@ -19,6 +19,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        //for future migrations
+        kapt{
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {
@@ -97,5 +103,6 @@ dependencies {
     //implementation("androidx.room:room-runtime:2.5.2")
     //annotationProcessor("androidx.room:room-compiler:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
+    //ksp is faster, for future updates
     kapt("androidx.room:room-compiler:2.5.2")
 }

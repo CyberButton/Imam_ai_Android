@@ -73,13 +73,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    Button(onClick = {viewmodel.getMessagesList()}) {
-//                        Column {
-//                            messagesList.forEach {
-//                                Greeting(name = it)
-//                            }
-//                        }
-//                    }
                     ChatScreen(onSendMessage = viewmodel::messageImam, messageList = messagesList)
                 }
             }

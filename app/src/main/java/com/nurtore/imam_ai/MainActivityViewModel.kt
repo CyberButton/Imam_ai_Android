@@ -2,7 +2,6 @@ package com.nurtore.imam_ai
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nurtore.imam_ai.model.DbMessageWithImam
@@ -11,7 +10,6 @@ import com.nurtore.imam_ai.model.Question
 import com.nurtore.imam_ai.repo.Repo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
