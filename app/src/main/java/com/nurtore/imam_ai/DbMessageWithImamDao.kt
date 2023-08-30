@@ -16,6 +16,6 @@ interface DbMessageWithImamDao {
 
     //can return Flow<> or LiveData<> to observe changes in db
     // ascending order
-    @Query("SELECT * FROM dbmessagewithimam ORDER BY sequence ASC")
+    @Query("SELECT * FROM dbmessagewithimam ORDER BY id ASC")
     fun getMessagesOrderedBySequence(): List<DbMessageWithImam>
 }

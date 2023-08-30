@@ -65,10 +65,10 @@ class MainActivityViewModel(
             val response: String = repo.messageImam("64e90de128bce87b8d7a86dc", Question(question))
             println(response)
             _messagesList.add(MessageWithImam("user", question))
-            dao.addMessage(DbMessageWithImam(++x,"user", question))
+            dao.addMessage(DbMessageWithImam("user", question))
 
             _messagesList.add(MessageWithImam("assistant", response))
-            dao.addMessage(DbMessageWithImam(++x,"assistant", response))
+            dao.addMessage(DbMessageWithImam("assistant", response))
             println("call successful")
         }
     }

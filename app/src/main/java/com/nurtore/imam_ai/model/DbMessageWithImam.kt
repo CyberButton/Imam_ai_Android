@@ -5,7 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class DbMessageWithImam(
-    val sequence: Int,
     val role: String,
     val content: String,
 
