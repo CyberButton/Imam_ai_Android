@@ -67,8 +67,12 @@ class MainActivity : ComponentActivity() {
                 val viewModelFactory = MainViewModelFactory(repo, db.dao)
                 val viewmodel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
                 val messagesList = viewmodel.messagesList
+
+                println(db.dao.numberOfChatId())
+
                 //viewmodel.deleteAllMessages()
                 viewmodel.initializeMessagesList()
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
