@@ -3,6 +3,7 @@ package com.nurtore.imam_ai.repo
 import com.nurtore.imam_ai.api.RetrofitInstance
 import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.model.Question
+import retrofit2.Response
 
 class Repo {
 

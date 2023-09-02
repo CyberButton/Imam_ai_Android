@@ -31,4 +31,7 @@ interface DbMessageWithImamDao {
 
     @Query("SELECT COUNT(*) FROM chatid")
     fun numberOfChatId(): Int
+
+    @Query("SELECT COUNT(*) FROM dbmessagewithimam")
+    fun numberOfMessages(): Int
 }

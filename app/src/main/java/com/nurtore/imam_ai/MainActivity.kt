@@ -3,6 +3,7 @@ package com.nurtore.imam_ai
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,26 +26,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nurtore.imam_ai.repo.Repo
 import com.nurtore.imam_ai.ui.theme.Imam_aiTheme
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
 import androidx.room.Room
 import com.nurtore.imam_ai.model.MessageWithImam
-import kotlinx.coroutines.coroutineScope
 
 class MainActivity : ComponentActivity() {
 
@@ -64,39 +67,33 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
 
                 val repo = Repo()
-                val viewModelFactory = MainViewModelFactory(repo, db.dao)
+                val viewModelFactory = MainViewModelFactory(repo, db.dao, application)
                 val viewmodel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
                 val messagesList = viewmodel.messagesList
-
-                println(db.dao.numberOfChatId())
-
-                //viewmodel.deleteAllMessages()
-                viewmodel.initializeMessagesList()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ChatScreen(onSendMessage = viewmodel::messageImam, messageList = messagesList)
+                    ChatScreen(
+                        onSendMessage = viewmodel::messageImam,
+                        messageList = messagesList,
+                        deleteMessages = viewmodel::deleteAllMessages,
+                        getNewMessageId = viewmodel::getNewChatId
+                        )
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     messageList: List<MessageWithImam>,
-    onSendMessage: (String) -> Unit
+    onSendMessage: (String) -> Unit,
+    deleteMessages: () -> Unit,
+    getNewMessageId: () -> Unit
 ) {
     val message = rememberSaveable {
         mutableStateOf("")
@@ -113,10 +110,18 @@ fun ChatScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.imam),
+                contentDescription = "imam",
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(65.dp)
+            )
             Text(
-                text = "Messages",
+                text = "Iman AI",
                 modifier = Modifier.weight(1f)
             )
+            DeleteButtonWithDialog(deleteMessages, getNewMessageId)
         }
         LazyColumn(
             modifier = Modifier
@@ -195,10 +200,47 @@ fun ChatMessage(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    Imam_aiTheme {
-//        Greeting("Android")
-//    }
-//}
+@Composable
+fun DeleteButtonWithDialog(deleteMessages: () -> Unit, getNewMessageId: () -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Button(
+            onClick = { showDialog = true },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = "Delete")
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Confirm Deletion") },
+                text = { Text("Are you sure you want to delete this item?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            deleteMessages()
+                            getNewMessageId()
+                            showDialog = false
+                        }
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+    }
+}

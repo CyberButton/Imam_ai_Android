@@ -2,6 +2,7 @@ package com.nurtore.imam_ai.api
 
 import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.model.Question
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
