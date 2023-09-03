@@ -41,6 +41,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -70,6 +71,7 @@ class MainActivity : ComponentActivity() {
                 val viewModelFactory = MainViewModelFactory(repo, db.dao, application)
                 val viewmodel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
                 val messagesList = viewmodel.messagesList
+                val isOnline = viewmodel.isConnected
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -79,7 +81,8 @@ class MainActivity : ComponentActivity() {
                         onSendMessage = viewmodel::messageImam,
                         messageList = messagesList,
                         deleteMessages = viewmodel::deleteAllMessages,
-                        getNewMessageId = viewmodel::getNewChatId
+                        getNewMessageId = viewmodel::getNewChatId,
+                        isOnline = isOnline
                         )
                 }
             }
@@ -93,7 +96,8 @@ fun ChatScreen(
     messageList: List<MessageWithImam>,
     onSendMessage: (String) -> Unit,
     deleteMessages: () -> Unit,
-    getNewMessageId: () -> Unit
+    getNewMessageId: () -> Unit,
+    isOnline: MutableState<Boolean>
 ) {
     val message = rememberSaveable {
         mutableStateOf("")
@@ -150,22 +154,34 @@ fun ChatScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextField(
-                value = message.value,
-                onValueChange = { message.value = it },
-                modifier = Modifier.weight(1f),
-                placeholder = {
-                    Text(text = "Message")
+            if(isOnline.value) {
+                TextField(
+                    value = message.value,
+                    onValueChange = { message.value = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = {
+                        Text(text = "Message")
+                    }
+                )
+                IconButton(onClick = {
+                    onSendMessage(message.value)
+                    message.value = ""
+                    keyboardController?.hide()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "Send message"
+                    )
                 }
-            )
-            IconButton(onClick = {
-                onSendMessage(message.value)
-                message.value = ""
-                keyboardController?.hide()
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = "Send message"
+            } else {
+                TextField(
+                    value = message.value,
+                    onValueChange = { message.value = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = {
+                        Text(text = "No Internet")
+                    },
+                     enabled = false
                 )
             }
         }

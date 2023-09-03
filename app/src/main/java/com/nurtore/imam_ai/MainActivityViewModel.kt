@@ -45,6 +45,7 @@ class MainActivityViewModel(
     private var chatId = ""
 
     val isConnected = mutableStateOf(isOnline(getApplication()))
+    //val isConnected: Boolean = _isConnected
 
     // only for SDK 24+ (inclusive)
     private val connectivityManager = getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
