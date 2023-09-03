@@ -37,6 +37,7 @@ import com.nurtore.imam_ai.ui.theme.Imam_aiTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Send
@@ -47,12 +48,18 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.room.Room
 import com.nurtore.imam_ai.model.MessageWithImam
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -105,7 +112,10 @@ fun ChatScreen(
     val message = rememberSaveable {
         mutableStateOf("")
     }
-    val keyboardController = LocalSoftwareKeyboardController.current
+//    val keyboardController = LocalSoftwareKeyboardController.current
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -137,9 +147,13 @@ fun ChatScreen(
                 .clickable(
                     interactionSource = MutableInteractionSource(),
                     indication = null
-                    ) { keyboardController?.hide() },
+                ) {
+                    focusManager.clearFocus()
+                    println("hide from outer touch")
+                },
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            state = listState
         ) {
             items(messageList) { message ->
                 Column(
@@ -174,7 +188,10 @@ fun ChatScreen(
                     if(message.value != "") {
                         onSendMessage(message.value)
                         message.value = ""
-                        keyboardController?.hide()
+                        coroutineScope.launch {
+                            listState.scrollToItem(index = listState.layoutInfo.totalItemsCount - 1)
+                        }
+                        focusManager.clearFocus()
                     }
                 }) {
                     Icon(
