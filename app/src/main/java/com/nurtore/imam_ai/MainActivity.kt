@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -122,7 +125,7 @@ fun ChatScreen(
                     .size(65.dp)
             )
             Text(
-                text = "Iman AI",
+                text = "Imam AI",
                 modifier = Modifier.weight(1f)
             )
             DeleteButtonWithDialog(deleteMessages, getNewMessageId)
@@ -130,7 +133,11 @@ fun ChatScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .clickable(
+                    interactionSource = MutableInteractionSource(),
+                    indication = null
+                    ) { keyboardController?.hide() },
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -236,7 +243,7 @@ fun DeleteButtonWithDialog(deleteMessages: () -> Unit, getNewMessageId: () -> Un
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 title = { Text("Confirm Deletion") },
-                text = { Text("Are you sure you want to delete this item?") },
+                text = { Text("Are you sure you want to delete this chat?") },
                 confirmButton = {
                     Button(
                         onClick = {
