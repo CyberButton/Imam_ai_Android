@@ -164,9 +164,11 @@ fun ChatScreen(
                     }
                 )
                 IconButton(onClick = {
-                    onSendMessage(message.value)
-                    message.value = ""
-                    keyboardController?.hide()
+                    if(message.value != "") {
+                        onSendMessage(message.value)
+                        message.value = ""
+                        keyboardController?.hide()
+                    }
                 }) {
                     Icon(
                         imageVector = Icons.Default.Send,
@@ -175,13 +177,10 @@ fun ChatScreen(
                 }
             } else {
                 TextField(
-                    value = message.value,
+                    value = "No Internet",
                     onValueChange = { message.value = it },
                     modifier = Modifier.weight(1f),
-                    placeholder = {
-                        Text(text = "No Internet")
-                    },
-                     enabled = false
+                    enabled = false
                 )
             }
         }
