@@ -11,16 +11,16 @@ import retrofit2.http.Path
 interface ImamAIAPI {
     // wrap with response to hande exceptions : https://www.youtube.com/watch?v=sBCE_hOFnQU&list=PLSrm9z4zp4mF1Ssdfuocy2XH5Bw4wLLNw&index=1&ab_channel=Stevdza-San
     @GET("messages/en/new")
-    suspend fun getChatId(): String
+    suspend fun getChatId(): Response<String>
 
     @POST("messages/{chat_id}")
     suspend fun messageImam(
         @Path("chat_id") chatId: String,
         @Body question: Question
-    ): String
+    ): Response<String>
 
     @GET("messages/{chat_id}")
     suspend fun getMessagesList(
         @Path("chat_id") chatId: String
-    ): List<MessageWithImam>
+    ): Response<List<MessageWithImam>>
 }

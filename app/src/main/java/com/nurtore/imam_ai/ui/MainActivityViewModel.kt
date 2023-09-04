@@ -1,4 +1,4 @@
-package com.nurtore.imam_ai
+package com.nurtore.imam_ai.ui
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -8,26 +8,22 @@ import android.net.Network
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nurtore.imam_ai.api.Repo
+import com.nurtore.imam_ai.db.DbMessageWithImamDao
 import com.nurtore.imam_ai.model.ChatId
 import com.nurtore.imam_ai.model.DbMessageWithImam
 import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.model.Question
-import com.nurtore.imam_ai.repo.Repo
 import com.nurtore.imam_ai.utils.isOnline
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
 import retrofit2.HttpException
-import retrofit2.Response
 import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -45,7 +41,6 @@ class MainActivityViewModel(
     private var chatId = ""
 
     val isConnected = mutableStateOf(isOnline(getApplication()))
-    //val isConnected: Boolean = _isConnected
 
     // only for SDK 24+ (inclusive)
     private val connectivityManager = getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -69,7 +64,7 @@ class MainActivityViewModel(
 
     fun getNewChatId() {
         viewModelScope.launch {
-            val response: String = repo.getChatId()
+            val response: String = repo.getChatId().body()!!
             chatId = response
             println("new chat id is $chatId")
             runBlocking(Dispatchers.IO) {
@@ -171,16 +166,26 @@ class MainActivityViewModel(
         viewModelScope.launch {
 
             _messagesList.add(MessageWithImam("user", question))
-            dao.addMessage(DbMessageWithImam("user", question))
             println(question)
 
-            val response: String = repo.messageImam(chatId, Question(question))
-            println(response)
-
-            _messagesList.add(MessageWithImam("assistant", response))
-            dao.addMessage(DbMessageWithImam("assistant", response))
-
-            println("call successful")
+            try {
+                val response = repo.messageImam(chatId, Question(question))
+                if(response.isSuccessful && !response.body().isNullOrEmpty()) {
+                    dao.addMessage(DbMessageWithImam("user", question))
+                    _messagesList.add(MessageWithImam("assistant", response.body()!!))
+                    dao.addMessage(DbMessageWithImam("assistant", response.body()!!))
+                    println("call successful")
+                }
+            } catch (e: IOException) {
+                _messagesList.add(MessageWithImam("assistant", "sorry there was error"))
+                println("Network error: $e")
+            } catch (e: HttpException) {
+                _messagesList.add(MessageWithImam("assistant", "sorry there was error"))
+                println("HTTP error: $e")
+            } catch (e: Exception) {
+                _messagesList.add(MessageWithImam("assistant", "sorry there was error"))
+                println("An unexpected error occurred: $e")
+            }
         }
     }
 
@@ -192,7 +197,7 @@ class MainActivityViewModel(
         )
 
         viewModelScope.launch {
-            val response: List<MessageWithImam> = repo.getMessagesList(chatId)
+            val response: List<MessageWithImam> = repo.getMessagesList(chatId).body()!!
             _messagesList.clear()  // Clear the existing list if needed
             _messagesList.addAll(response)
             for(message in response) {
@@ -232,7 +237,7 @@ class MainActivityViewModel(
                     repo.getChatId()
                 }
                 response.await()
-                chatId = response.getCompleted()
+                chatId = response.getCompleted().body()!!
                 println("new chat id is $chatId")
                 withContext(Dispatchers.IO) {
                     dao.insertChatId(ChatId(chatId))

@@ -1,9 +1,10 @@
-package com.nurtore.imam_ai
+package com.nurtore.imam_ai.ui
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.nurtore.imam_ai.repo.Repo
+import com.nurtore.imam_ai.api.Repo
+import com.nurtore.imam_ai.db.DbMessageWithImamDao
 
 class MainViewModelFactory(
     private val repo: Repo,

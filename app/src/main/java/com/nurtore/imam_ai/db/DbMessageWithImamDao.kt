@@ -1,4 +1,4 @@
-package com.nurtore.imam_ai
+package com.nurtore.imam_ai.db
 
 import androidx.room.Dao
 import androidx.room.Insert
