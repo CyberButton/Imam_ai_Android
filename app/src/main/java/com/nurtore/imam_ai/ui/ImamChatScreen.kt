@@ -5,13 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,10 +23,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,7 +48,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nurtore.imam_ai.R
 import com.nurtore.imam_ai.model.MessageWithImam
 import kotlinx.coroutines.launch
@@ -54,7 +62,8 @@ fun ChatScreen(
     onSendMessage: (String) -> Unit,
     deleteMessages: () -> Unit,
     getNewMessageId: () -> Unit,
-    isOnline: MutableState<Boolean>
+    isOnline: MutableState<Boolean>,
+    uiState: MutableState<Int>
 ) {
     val message = rememberSaveable {
         mutableStateOf("")
@@ -86,72 +95,87 @@ fun ChatScreen(
             )
             DeleteButtonWithDialog(deleteMessages, getNewMessageId)
         }
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .clickable(
-                    interactionSource = MutableInteractionSource(),
-                    indication = null
+        when(uiState.value) {
+            0 -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    focusManager.clearFocus()
-                    println("hide from outer touch")
-                },
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            state = listState
-        ) {
-            items(messageList) { message ->
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    ChatMessage(
-                        message = message,
-                        modifier = Modifier
-                            .align(
-                                if(message.sentByImam()) Alignment.Start else Alignment.End
-                            )
-                    )
+                    RetryButton(getNewMessageId)
                 }
             }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if(isOnline.value) {
-                TextField(
-                    value = message.value,
-                    onValueChange = { message.value = it },
-                    modifier = Modifier.weight(1f),
-                    placeholder = {
-                        Text(text = "Message")
-                    }
-                )
-                IconButton(onClick = {
-                    if(message.value != "") {
-                        onSendMessage(message.value)
-                        message.value = ""
-                        coroutineScope.launch {
-                            listState.scrollToItem(index = listState.layoutInfo.totalItemsCount - 1)
+            1 -> {
+                LoadingAnimation()
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .clickable(
+                            interactionSource = MutableInteractionSource(),
+                            indication = null
+                        ) {
+                            focusManager.clearFocus()
+                            println("hide from outer touch")
+                        },
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    state = listState
+                ) {
+                    items(messageList) { message ->
+                        Column(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ChatMessage(
+                                message = message,
+                                modifier = Modifier
+                                    .align(
+                                        if (message.sentByImam()) Alignment.Start else Alignment.End
+                                    )
+                            )
                         }
-                        focusManager.clearFocus()
                     }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "Send message"
-                    )
                 }
-            } else {
-                TextField(
-                    value = "No Internet",
-                    onValueChange = { message.value = it },
-                    modifier = Modifier.weight(1f),
-                    enabled = false
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if(isOnline.value) {
+                        TextField(
+                            value = message.value,
+                            onValueChange = { message.value = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = {
+                                Text(text = "Message")
+                            }
+                        )
+                        IconButton(onClick = {
+                            if(message.value != "") {
+                                onSendMessage(message.value)
+                                message.value = ""
+                                coroutineScope.launch {
+                                    listState.scrollToItem(index = listState.layoutInfo.totalItemsCount - 1)
+                                }
+                                focusManager.clearFocus()
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Send,
+                                contentDescription = "Send message"
+                            )
+                        }
+                    } else {
+                        TextField(
+                            value = "No Internet",
+                            onValueChange = { message.value = it },
+                            modifier = Modifier.weight(1f),
+                            enabled = false
+                        )
+                    }
+                }
             }
         }
     }
@@ -225,6 +249,46 @@ fun DeleteButtonWithDialog(deleteMessages: () -> Unit, getNewMessageId: () -> Un
                         Text("Cancel")
                     }
                 }
+            )
+        }
+    }
+}
+
+@Composable
+fun LoadingAnimation() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun RetryButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .padding(16.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Reconnect",
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Reconnect",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
         }
     }

@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -41,6 +42,11 @@ class MainActivityViewModel(
     private var chatId = ""
 
     val isConnected = mutableStateOf(isOnline(getApplication()))
+
+    // 0 - no chatId (show retry button)
+    // 1 - loading
+    // 3 - success
+    val chatIdState = mutableStateOf(1)
 
     // only for SDK 24+ (inclusive)
     private val connectivityManager = getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -64,74 +70,54 @@ class MainActivityViewModel(
 
     fun getNewChatId() {
         viewModelScope.launch {
-            val response: String = repo.getChatId().body()!!
-            chatId = response
-            println("new chat id is $chatId")
-            runBlocking(Dispatchers.IO) {
-                _messagesList.add(
-                    MessageWithImam("assistant", "Assalamu Alaikum!" +
-                            " How may I help you?"))
-                dao.insertChatId(ChatId(chatId))
-                dao.addMessage(
-                    DbMessageWithImam("assistant", "Assalamu Alaikum!" +
-                            " How may I help you?")
-                )
+            var attempt = 0
+            val maxAttempts = 3
+            chatIdState.value = 1
+            while (attempt < maxAttempts) {
+                try {
+                    val response = viewModelScope.async(Dispatchers.IO) {
+                        repo.getChatId()
+                    }
+                    response.await()
+                    if (response.getCompleted().isSuccessful && !response.getCompleted().body()
+                            .isNullOrEmpty()
+                    ) {
+                        chatId = response.getCompleted().body()!!
+                        println("new chat id is $chatId")
+                        runBlocking(Dispatchers.IO) {
+                            _messagesList.add(
+                                MessageWithImam("assistant", "Assalamu Alaikum!" +
+                                        " How may I help you?"))
+                            dao.insertChatId(ChatId(chatId))
+                            dao.addMessage(
+                                DbMessageWithImam("assistant", "Assalamu Alaikum!" +
+                                        " How may I help you?")
+                            )
+                        }
+                        chatIdState.value = 3
+                        break
+                    }
+                } catch (e: IOException) {
+                    chatIdState.value = 1
+                    println("Network error: $e")
+                } catch (e: HttpException) {
+                    chatIdState.value = 1
+                    println("HTTP error: $e")
+                } catch (e: Exception) {
+                    chatIdState.value = 1
+                    println("An unexpected error occurred: $e")
+                }
+                attempt++
+                if (attempt < maxAttempts) {
+                    delay(1000) // Delay 1 seconds before the next attempt
+                }
+            }
+            if (attempt == maxAttempts) {
+                println("Max retry attempts reached.")
+                chatIdState.value = 0
             }
         }
     }
-
-    fun getNewChatId_Next_Ver() {
-//        viewModelScope.launch {
-//            var attempt = 0
-//            val maxAttempts = 3
-//
-//            while (attempt < maxAttempts) {
-//                try {
-//                    val response: Response<String> = repo.getChatId()
-//                    if (response.isSuccessful) {
-//                        val newChatId = response.body()
-//                        if (newChatId != null) {
-//                            chatId = newChatId
-//                            println("new chat id is $chatId")
-//                            withContext(Dispatchers.IO) {
-//                                dao.insertChatId(ChatId(chatId))
-//                                dao.addMessage(
-//                                    DbMessageWithImam("assistant", "Assalamu Alaikum!" +
-//                                            " How may I help you?")
-//                                )
-//                                _messagesList.add(
-//                                    MessageWithImam("assistant", "Assalamu Alaikum!" +
-//                                            " How may I help you?")
-//                                )
-//                            }
-//                            break // Exit while loop if the operation is successful
-//                        } else {
-//                            println("Received null chat ID from the server.")
-//                        }
-//                    } else {
-//                        println("Failed to get a new chat ID: ${response.errorBody()?.string()}")
-//                    }
-//                } catch (e: IOException) {
-//                    println("Network error: $e")
-//                } catch (e: HttpException) {
-//                    println("HTTP error: $e")
-//                } catch (e: Exception) {
-//                    println("An unexpected error occurred: $e")
-//                }
-//
-//                attempt++
-//                if (attempt < maxAttempts) {
-//                    delay(1000) // Delay 1 seconds before the next attempt
-//                }
-//            }
-//
-//            if (attempt == maxAttempts) {
-//                println("Max retry attempts reached.")
-//                // Handle this case as you need
-//            }
-//        }
-    }
-
 
     private fun loadChatIdFromDb() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -233,25 +219,55 @@ class MainActivityViewModel(
             dBResponse.await()
             if (dBResponse.getCompleted() == 0) {
                 println("no chat id was found")
-                val response = viewModelScope.async(Dispatchers.IO){
-                    repo.getChatId()
+                var attempt = 0
+                val maxAttempts = 3
+
+                while (attempt < maxAttempts) {
+                    try {
+                        val response = viewModelScope.async(Dispatchers.IO) {
+                            repo.getChatId()
+                        }
+                        response.await()
+                        if(response.getCompleted().isSuccessful && !response.getCompleted().body().isNullOrEmpty()) {
+                            chatId = response.getCompleted().body()!!
+                            println("new chat id is $chatId")
+                            withContext(Dispatchers.IO) {
+                                dao.insertChatId(ChatId(chatId))
+                            }
+                            chatIdState.value = 3
+                            break
+                        }
+                    } catch (e: IOException) {
+                        chatIdState.value = 1
+                        println("Network error: $e")
+                    } catch (e: HttpException) {
+                        chatIdState.value = 1
+                        println("HTTP error: $e")
+                    } catch (e: Exception) {
+                        chatIdState.value = 1
+                        println("An unexpected error occurred: $e")
+                    }
+                    attempt++
+                    if (attempt < maxAttempts) {
+                        delay(1000) // Delay 1 seconds before the next attempt
+                    }
                 }
-                response.await()
-                chatId = response.getCompleted().body()!!
-                println("new chat id is $chatId")
-                withContext(Dispatchers.IO) {
-                    dao.insertChatId(ChatId(chatId))
+                if (attempt == maxAttempts) {
+                    println("Max retry attempts reached.")
+                    chatIdState.value = 0
                 }
             } else {
                 println("chat id was found in db")
+                chatIdState.value = 3
                 loadChatIdFromDb()
             }
-
-            if (noMessages()) {
-                println("no local messages were found")
-                getMessagesList()
-            } else {
-                initializeMessagesList()
+            if (chatIdState.value == 3) {
+                if (noMessages()) {
+                    println("no local messages were found")
+                    getMessagesList()
+                } else {
+                    initializeMessagesList()
+                }
             }
         }
     }

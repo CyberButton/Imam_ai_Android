@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
                 val viewmodel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
                 val messagesList = viewmodel.messagesList
                 val isOnline = viewmodel.isConnected
+                val uiState = viewmodel.chatIdState
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -47,8 +48,9 @@ class MainActivity : ComponentActivity() {
                         messageList = messagesList,
                         deleteMessages = viewmodel::deleteAllMessages,
                         getNewMessageId = viewmodel::getNewChatId,
-                        isOnline = isOnline
-                        )
+                        isOnline = isOnline,
+                        uiState = uiState
+                    )
                 }
             }
         }
