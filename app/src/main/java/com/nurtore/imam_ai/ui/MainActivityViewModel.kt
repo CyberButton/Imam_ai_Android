@@ -181,15 +181,31 @@ class MainActivityViewModel(
             MessageWithImam("assistant", "Assalamu Alaikum!" +
                     " How may I help you?")
         )
-
+        var loaded = false
         viewModelScope.launch {
-            val response: List<MessageWithImam> = repo.getMessagesList(chatId).body()!!
-            _messagesList.clear()  // Clear the existing list if needed
-            _messagesList.addAll(response)
-            for(message in response) {
-                dao.addMessage(DbMessageWithImam(message.role, message.content))
+            try {
+                val response: List<MessageWithImam> = repo.getMessagesList(chatId).body()!!
+                _messagesList.clear()
+                _messagesList.addAll(response)
+                for(message in response) {
+                    dao.addMessage(DbMessageWithImam(message.role, message.content))
+                }
+                loaded = true
+                println("messages loaded from API")
+            } catch (e: IOException) {
+                println("Network error: $e")
+            } catch (e: HttpException) {
+                println("HTTP error: $e")
+            } catch (e: Exception) {
+                println("An unexpected error occurred: $e")
             }
-            println("messages loaded from API")
+            if (!loaded) {
+                dao.addMessage(
+                    DbMessageWithImam("assistant", "Assalamu Alaikum!" +
+                            " How may I help you?")
+                )
+            }
+            println("api failed, empty start")
         }
     }
 

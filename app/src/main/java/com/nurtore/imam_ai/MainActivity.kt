@@ -15,6 +15,9 @@ import com.nurtore.imam_ai.ui.ChatScreen
 import com.nurtore.imam_ai.ui.MainActivityViewModel
 import com.nurtore.imam_ai.ui.MainViewModelFactory
 import com.nurtore.imam_ai.ui.theme.Imam_aiTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
 
@@ -38,7 +41,9 @@ class MainActivity : ComponentActivity() {
                 val messagesList = viewmodel.messagesList
                 val isOnline = viewmodel.isConnected
                 val uiState = viewmodel.chatIdState
-
+//                runBlocking {
+//                    db.dao.deleteAllMessages()
+//                }
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

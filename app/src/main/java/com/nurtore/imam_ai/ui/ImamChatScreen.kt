@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nurtore.imam_ai.R
 import com.nurtore.imam_ai.model.MessageWithImam
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -157,7 +158,8 @@ fun ChatScreen(
                                 onSendMessage(message.value)
                                 message.value = ""
                                 coroutineScope.launch {
-                                    listState.scrollToItem(index = listState.layoutInfo.totalItemsCount - 1)
+                                    delay(750)
+                                    listState.animateScrollToItem(index = listState.layoutInfo.totalItemsCount - 1)
                                 }
                                 focusManager.clearFocus()
                             }
