@@ -55,6 +55,9 @@ class MainActivityViewModel(
     private val _scroll = mutableStateOf(0)
     val scroll = _scroll
 
+    val typing = mutableStateOf(false)
+
+
     // only for SDK 24+ (inclusive)
     private val connectivityManager = getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     var networkCallback = object : ConnectivityManager.NetworkCallback() {}
@@ -160,6 +163,8 @@ class MainActivityViewModel(
     fun messageImam(question: String) {
         viewModelScope.launch {
 
+            typing.value = true
+
             _messagesList.add(MessageWithImam("user", question))
             println(question)
 
@@ -181,6 +186,7 @@ class MainActivityViewModel(
                 _messagesList.add(MessageWithImam("assistant", "sorry there was error"))
                 println("An unexpected error occurred: $e")
             }
+            typing.value = false
             _scroll.value++
         }
     }

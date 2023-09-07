@@ -1,7 +1,11 @@
 package com.nurtore.imam_ai.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +37,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -66,7 +72,8 @@ fun ChatScreen(
     getNewMessageId: () -> Unit,
     isOnline: MutableState<Boolean>,
     uiState: MutableState<Int>,
-    scrollState: MutableState<Int>
+    scrollState: MutableState<Int>,
+    typing: MutableState<Boolean>
 ) {
     val message = rememberSaveable {
         mutableStateOf("")
@@ -137,6 +144,11 @@ fun ChatScreen(
                                         if (message.sentByImam()) Alignment.Start else Alignment.End
                                     )
                             )
+                        }
+                    }
+                    if (typing.value) {
+                        item {
+                            DotsTyping()
                         }
                     }
                 }
@@ -302,5 +314,74 @@ fun RetryButton(onClick: () -> Unit) {
                 color = Color.White
             )
         }
+    }
+}
+
+val dotSize = 10.dp // made it bigger for demo
+val delayUnit = 200 // you can change delay to change animation speed
+
+@Composable
+fun DotsTyping() {
+    val maxOffset = 10f
+
+    @Composable
+    fun Dot(
+        offset: Float
+    ) = Spacer(
+        Modifier
+            .size(dotSize)
+            .offset(y = -offset.dp)
+            .background(
+                color = MaterialTheme.colorScheme.onBackground,
+                shape = CircleShape
+            )
+    )
+
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+
+    @Composable
+    fun animateOffsetWithDelay(delay: Int) = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = delayUnit * 4
+                0f at delay with LinearEasing
+                maxOffset at delay + delayUnit with LinearEasing
+                0f at delay + delayUnit * 2
+            }
+        ), label = ""
+    )
+
+    val offset1 by animateOffsetWithDelay(0)
+    val offset2 by animateOffsetWithDelay(delayUnit)
+    val offset3 by animateOffsetWithDelay(delayUnit * 2)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+            .padding(top = maxOffset.dp)
+
+            .clip(
+                RoundedCornerShape(
+                    topStart = 0.dp,
+                    topEnd = 15.dp,
+                    bottomStart = 15.dp,
+                    bottomEnd = 15.dp
+                )
+            )
+            .background(
+                Color.LightGray
+            )
+            .padding(16.dp)
+    ) {
+        val spaceSize = 2.dp
+
+        Dot(offset1)
+        Spacer(Modifier.width(spaceSize))
+        Dot(offset2)
+        Spacer(Modifier.width(spaceSize))
+        Dot(offset3)
     }
 }

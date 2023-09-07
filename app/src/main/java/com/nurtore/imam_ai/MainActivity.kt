@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
                 val isOnline = viewmodel.isConnected
                 val uiState = viewmodel.chatIdState
                 val scrollState = viewmodel.scroll
+                val typing = viewmodel.typing
 //                runBlocking {
 //                    db.dao.deleteAllMessages()
 //                }
@@ -53,7 +54,8 @@ class MainActivity : ComponentActivity() {
                         getNewMessageId = viewmodel::getNewChatId,
                         isOnline = isOnline,
                         uiState = uiState,
-                        scrollState = scrollState
+                        scrollState = scrollState,
+                        typing = typing
                     )
                 }
             }
