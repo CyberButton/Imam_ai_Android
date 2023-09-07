@@ -2,12 +2,16 @@ package com.nurtore.imam_ai.ui
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.app.usage.UsageEvents.Event
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.nurtore.imam_ai.api.Repo
 import com.nurtore.imam_ai.db.DbMessageWithImamDao
@@ -48,6 +52,9 @@ class MainActivityViewModel(
     // 3 - success
     val chatIdState = mutableStateOf(1)
 
+    private val _scroll = mutableStateOf(0)
+    val scroll = _scroll
+
     // only for SDK 24+ (inclusive)
     private val connectivityManager = getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     var networkCallback = object : ConnectivityManager.NetworkCallback() {}
@@ -64,6 +71,8 @@ class MainActivityViewModel(
                 _messagesList.clear() // Clear the existing list
                 _messagesList.addAll(messages) // Add the mapped messages
             }
+
+            _scroll.value++
             println("messages loaded from db")
         }
     }
@@ -172,6 +181,7 @@ class MainActivityViewModel(
                 _messagesList.add(MessageWithImam("assistant", "sorry there was error"))
                 println("An unexpected error occurred: $e")
             }
+            _scroll.value++
         }
     }
 
@@ -204,8 +214,9 @@ class MainActivityViewModel(
                     DbMessageWithImam("assistant", "Assalamu Alaikum!" +
                             " How may I help you?")
                 )
+                println("api failed, empty start")
             }
-            println("api failed, empty start")
+            _scroll.value++
         }
     }
 
