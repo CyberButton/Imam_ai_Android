@@ -2,6 +2,8 @@ package com.nurtore.imam_ai.ui.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -11,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -50,7 +54,9 @@ fun BottomBarContents(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar {
+    NavigationBar(
+        modifier = Modifier.height(40.dp)
+    ) {
         screens.forEach {screen ->
             NavigationBarItem(
                 selected = currentDestination?.hierarchy?.any {
@@ -65,9 +71,9 @@ fun BottomBarContents(navHostController: NavHostController) {
                 icon = {
                        Image(imageVector = screen.icon, contentDescription = "icon")
                 },
-                label = {
-                    Text(text = screen.title)
-                },
+//                label = {
+//                    Text(text = screen.title)
+//                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.Black,
                     selectedTextColor = Color.Black,

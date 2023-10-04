@@ -17,11 +17,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -76,19 +78,21 @@ fun ImamChatScreen(
     val message = rememberSaveable {
         mutableStateOf("")
     }
-    val listState = rememberLazyListState()
+    val listState = imamChatViewModel.listState.value
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(bottom = 40.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
+                .height(50.dp),
+                verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = R.drawable.imam),
@@ -99,9 +103,10 @@ fun ImamChatScreen(
             )
             Text(
                 text = "Imam AI",
-                modifier = Modifier.weight(1f)
+                //modifier = Modifier.weight(1f)
             )
             DeleteButtonWithDialog(
+                modifier = Modifier,
                 { imamChatViewModel.deleteAllMessages() },
                 { imamChatViewModel.getNewChatId() }
             )
@@ -234,18 +239,21 @@ fun ChatMessage(
 }
 
 @Composable
-fun DeleteButtonWithDialog(deleteMessages: () -> Unit, getNewMessageId: () -> Unit) {
+fun DeleteButtonWithDialog(
+    modifier: Modifier,
+    deleteMessages: () -> Unit,
+    getNewMessageId: () -> Unit
+) {
     var showDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.CenterEnd
     ) {
         Button(
             onClick = { showDialog = true },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-            modifier = Modifier.padding(16.dp)
+            //modifier = modifier.padding(16.dp)
         ) {
             Text(text = "Delete")
         }

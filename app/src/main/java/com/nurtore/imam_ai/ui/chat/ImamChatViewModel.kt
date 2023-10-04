@@ -5,6 +5,8 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -53,6 +55,8 @@ class ImamChatViewModel(
 
     val typing = mutableStateOf(false)
 
+    private val _listState = mutableStateOf(LazyListState())
+    val listState: State<LazyListState> get() = _listState
 
     // only for SDK 24+ (inclusive)
     private val connectivityManager = getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
