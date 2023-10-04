@@ -1,17 +1,13 @@
-package com.nurtore.imam_ai.ui
+package com.nurtore.imam_ai.ui.chat
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.app.usage.UsageEvents.Event
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.nurtore.imam_ai.api.Repo
 import com.nurtore.imam_ai.db.DbMessageWithImamDao
@@ -32,7 +28,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainActivityViewModel(
+class ImamChatViewModel(
     private val repo: Repo,
     private val dao: DbMessageWithImamDao,
     application: Application

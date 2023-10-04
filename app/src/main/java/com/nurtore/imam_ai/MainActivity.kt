@@ -11,9 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.nurtore.imam_ai.api.Repo
 import com.nurtore.imam_ai.db.DbMessageWithImamDatabase
-import com.nurtore.imam_ai.ui.ChatScreen
-import com.nurtore.imam_ai.ui.MainActivityViewModel
-import com.nurtore.imam_ai.ui.MainViewModelFactory
+import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
+import com.nurtore.imam_ai.ui.chat.ImamChatViewModelFactory
+import com.nurtore.imam_ai.ui.navigation.MainScreen
 import com.nurtore.imam_ai.ui.theme.Imam_aiTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,13 +33,9 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
 
                 val repo = Repo()
-                val viewModelFactory = MainViewModelFactory(repo, db.dao, application)
-                val viewmodel = ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel::class.java)
-                val messagesList = viewmodel.messagesList
-                val isOnline = viewmodel.isConnected
-                val uiState = viewmodel.chatIdState
-                val scrollState = viewmodel.scroll
-                val typing = viewmodel.typing
+                val viewModelFactoryImamChat = ImamChatViewModelFactory(repo, db.dao, application)
+                val viewmodelImamChat =
+                    ViewModelProvider(this, viewModelFactoryImamChat).get(ImamChatViewModel::class.java)
 //                runBlocking {
 //                    db.dao.deleteAllMessages()
 //                }
@@ -47,15 +43,20 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ChatScreen(
-                        onSendMessage = viewmodel::messageImam,
-                        messageList = messagesList,
-                        deleteMessages = viewmodel::deleteAllMessages,
-                        getNewMessageId = viewmodel::getNewChatId,
-                        isOnline = isOnline,
-                        uiState = uiState,
-                        scrollState = scrollState,
-                        typing = typing
+//                    ImamChatScreen(
+//                        onSendMessage = viewmodel::messageImam,
+//                        messageList = messagesList,
+//                        deleteMessages = viewmodel::deleteAllMessages,
+//                        getNewMessageId = viewmodel::getNewChatId,
+//                        isOnline = isOnline,
+//                        uiState = uiState,
+//                        scrollState = scrollState,
+//                        typing = typing
+//                    )
+//                }
+                    // ?
+                    MainScreen(
+                        imamChatViewModel = viewmodelImamChat
                     )
                 }
             }

@@ -1,4 +1,4 @@
-package com.nurtore.imam_ai.ui
+package com.nurtore.imam_ai.ui.chat
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -65,16 +65,14 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(
-    messageList: List<MessageWithImam>,
-    onSendMessage: (String) -> Unit,
-    deleteMessages: () -> Unit,
-    getNewMessageId: () -> Unit,
-    isOnline: MutableState<Boolean>,
-    uiState: MutableState<Int>,
-    scrollState: MutableState<Int>,
-    typing: MutableState<Boolean>
+fun ImamChatScreen(
+    imamChatViewModel: ImamChatViewModel
 ) {
+    val messageList = imamChatViewModel.messagesList
+    val isOnline = imamChatViewModel.isConnected
+    val uiState = imamChatViewModel.chatIdState
+    val scrollState = imamChatViewModel.scroll
+    val typing = imamChatViewModel.typing
     val message = rememberSaveable {
         mutableStateOf("")
     }
@@ -103,7 +101,10 @@ fun ChatScreen(
                 text = "Imam AI",
                 modifier = Modifier.weight(1f)
             )
-            DeleteButtonWithDialog(deleteMessages, getNewMessageId)
+            DeleteButtonWithDialog(
+                { imamChatViewModel.deleteAllMessages() },
+                { imamChatViewModel.getNewChatId() }
+            )
         }
         when(uiState.value) {
             0 -> {
@@ -111,7 +112,7 @@ fun ChatScreen(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    RetryButton(getNewMessageId)
+                    RetryButton { imamChatViewModel.getNewChatId() }
                 }
             }
             1 -> {
@@ -176,7 +177,7 @@ fun ChatScreen(
                         )
                         IconButton(onClick = {
                             if(message.value != "") {
-                                onSendMessage(message.value)
+                                imamChatViewModel.messageImam(message.value)
                                 message.value = ""
                                 coroutineScope.launch {
                                     delay(750)
@@ -385,3 +386,9 @@ fun DotsTyping() {
         Dot(offset3)
     }
 }
+
+
+//@Composable
+//fun ImamChatScreen() {
+//    Text(text = "this is chatScreen")
+//}
