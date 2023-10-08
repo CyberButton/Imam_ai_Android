@@ -1,11 +1,15 @@
 package com.nurtore.imam_ai
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
@@ -13,6 +17,9 @@ import com.nurtore.imam_ai.api.Repo
 import com.nurtore.imam_ai.db.DbMessageWithImamDatabase
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModelFactory
+import com.nurtore.imam_ai.ui.kibla.KiblaSearchScreen
+import com.nurtore.imam_ai.ui.kibla.KiblaSearchViewModel
+import com.nurtore.imam_ai.ui.kibla.KiblaSearchViewModelFactory
 import com.nurtore.imam_ai.ui.navigation.MainScreen
 import com.nurtore.imam_ai.ui.theme.Imam_aiTheme
 
@@ -25,6 +32,7 @@ class MainActivity : ComponentActivity() {
             "messages.db"
         ).build()
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +47,11 @@ class MainActivity : ComponentActivity() {
 //                runBlocking {
 //                    db.dao.deleteAllMessages()
 //                }
+
+                val factory = KiblaSearchViewModelFactory(this)
+                val viewModel = ViewModelProvider(this, factory).get(KiblaSearchViewModel::class.java)
+                val rotation by viewModel.rotationFlow.collectAsState(initial = 0f)
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -56,10 +69,26 @@ class MainActivity : ComponentActivity() {
 //                }
                     // ?
                     MainScreen(
-                        imamChatViewModel = viewmodelImamChat
+                        imamChatViewModel = viewmodelImamChat,
+                        compassDegree = rotation
                     )
                 }
             }
         }
     }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            KiblaSearchViewModel.LOCATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted. Now you can access the location.
+                    // TODO: Refresh or update location-based functionality.
+                } else {
+                    // Permission denied. Inform the user that the feature requires this permission.
+                    Toast.makeText(this, "Location permission is required for this feature.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
 }

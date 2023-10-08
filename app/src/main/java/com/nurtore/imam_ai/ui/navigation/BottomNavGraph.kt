@@ -13,7 +13,8 @@ import com.nurtore.imam_ai.ui.kibla.KiblaSearchScreen
 @Composable
 fun BottomNavGraph(
     navController: NavHostController,
-    imamChatViewModel: ImamChatViewModel
+    imamChatViewModel: ImamChatViewModel,
+    compassDegree: Float
     ) {
     NavHost(
         navController = navController,
@@ -28,7 +29,9 @@ fun BottomNavGraph(
             )
         }
         composable(route = BottomBar.Kibla.route) {
-            KiblaSearchScreen()
+            KiblaSearchScreen(
+                compassDegree
+            )
         }
     }
 }

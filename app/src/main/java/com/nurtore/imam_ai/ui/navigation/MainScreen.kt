@@ -29,7 +29,8 @@ import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
-    imamChatViewModel: ImamChatViewModel
+    imamChatViewModel: ImamChatViewModel,
+    compassDegree: Float
 ) {
     val navController = rememberNavController()
     Scaffold(
@@ -39,7 +40,8 @@ fun MainScreen(
     ) {
         BottomNavGraph(
             navController = navController,
-            imamChatViewModel = imamChatViewModel
+            imamChatViewModel = imamChatViewModel,
+            compassDegree = compassDegree
             )
     }
 }
