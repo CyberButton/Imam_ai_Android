@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.nurtore.imam_ai.ui.chat.ImamChatScreen
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 import com.nurtore.imam_ai.ui.homepage.HomePageScreen
+import com.nurtore.imam_ai.ui.homepage.HomePageViewModel
 import com.nurtore.imam_ai.ui.kibla.KiblaSearchScreen
 
 
@@ -14,14 +15,18 @@ import com.nurtore.imam_ai.ui.kibla.KiblaSearchScreen
 fun BottomNavGraph(
     navController: NavHostController,
     imamChatViewModel: ImamChatViewModel,
-    compassDegree: Float
-    ) {
+    compassDegree: Float,
+    homePageViewModel: HomePageViewModel
+) {
     NavHost(
         navController = navController,
         startDestination = BottomBar.Home.route
     ) {
         composable(route = BottomBar.Home.route) {
-            HomePageScreen()
+            HomePageScreen(
+                navController,
+                homePageViewModel
+            )
         }
         composable(route = BottomBar.Chat.route) {
             ImamChatScreen(

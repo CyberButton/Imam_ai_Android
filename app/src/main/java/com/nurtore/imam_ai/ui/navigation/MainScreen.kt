@@ -3,15 +3,12 @@ package com.nurtore.imam_ai.ui.navigation
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,8 +18,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
+import com.nurtore.imam_ai.ui.homepage.HomePageViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +27,8 @@ import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 @Composable
 fun MainScreen(
     imamChatViewModel: ImamChatViewModel,
-    compassDegree: Float
+    compassDegree: Float,
+    homePageViewModel: HomePageViewModel
 ) {
     val navController = rememberNavController()
     Scaffold(
@@ -41,7 +39,8 @@ fun MainScreen(
         BottomNavGraph(
             navController = navController,
             imamChatViewModel = imamChatViewModel,
-            compassDegree = compassDegree
+            compassDegree = compassDegree,
+            homePageViewModel = homePageViewModel
             )
     }
 }

@@ -11,9 +11,7 @@ class ImamChatViewModelFactory(
     private val dao: DbMessageWithImamDao,
     private val application: Application
 ): ViewModelProvider.Factory {
-
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ImamChatViewModel(repo, dao, application) as T
     }
-
 }

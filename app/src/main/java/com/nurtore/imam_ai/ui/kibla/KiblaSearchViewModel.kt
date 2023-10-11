@@ -32,7 +32,6 @@ class KiblaSearchViewModel(context: Context) : ViewModel(), SensorEventListener 
     private var currentLongitude: Double = 0.0
     private var currentAltitude: Double = 0.0
 
-
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
@@ -43,6 +42,8 @@ class KiblaSearchViewModel(context: Context) : ViewModel(), SensorEventListener 
     private val rotationChannel = Channel<Float>(Channel.CONFLATED)
     val rotationFlow: Flow<Float> = rotationChannel.receiveAsFlow()
 
+
+    // INCORRECT, WILL ONLY WORK FROM SECOND LAUCH
     init {
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
         sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL)
@@ -55,9 +56,11 @@ class KiblaSearchViewModel(context: Context) : ViewModel(), SensorEventListener 
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            Log.d("KIBLA-LOCATION", "ACCESS PROVIDED")
             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         } else {
             requestLocationPermission(context)
+            Log.d("KIBLA-LOCATION", "ACCESS DENIED")
             null
         }
 
@@ -66,8 +69,6 @@ class KiblaSearchViewModel(context: Context) : ViewModel(), SensorEventListener 
             currentLongitude = location.longitude
             currentAltitude = location.altitude
         }
-
-
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
