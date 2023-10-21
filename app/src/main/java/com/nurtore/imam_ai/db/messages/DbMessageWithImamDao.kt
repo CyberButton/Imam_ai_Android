@@ -1,11 +1,9 @@
-package com.nurtore.imam_ai.db
+package com.nurtore.imam_ai.db.messages
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.nurtore.imam_ai.model.ChatId
-import com.nurtore.imam_ai.model.DbMessageWithImam
 
 @Dao
 interface DbMessageWithImamDao {

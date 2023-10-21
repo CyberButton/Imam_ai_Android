@@ -110,4 +110,11 @@ dependencies {
 
     //navigation
     implementation("androidx.navigation:navigation-compose:2.5.3")
+
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.8.1") // Use the latest version
+
+    // For notifications
+    implementation("androidx.core:core-ktx:1.7.0") // Use the latest version
+
 }

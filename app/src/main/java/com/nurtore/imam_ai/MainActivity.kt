@@ -16,22 +16,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import com.google.android.gms.location.LocationServices
 import com.nurtore.imam_ai.api.Repo
-import com.nurtore.imam_ai.db.DbMessageWithImamDatabase
+import com.nurtore.imam_ai.db.messages.DbMessageWithImamDatabase
+import com.nurtore.imam_ai.db.schedule.ScheduleDatabase
+import com.nurtore.imam_ai.notifications.schedulePrayerNotifications
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModelFactory
 import com.nurtore.imam_ai.ui.homepage.HomePageViewModel
 import com.nurtore.imam_ai.ui.homepage.HomePageViewModelFactory
-import com.nurtore.imam_ai.ui.kibla.KiblaSearchScreen
 import com.nurtore.imam_ai.ui.kibla.KiblaSearchViewModel
 import com.nurtore.imam_ai.ui.kibla.KiblaSearchViewModelFactory
 import com.nurtore.imam_ai.ui.navigation.MainScreen
 import com.nurtore.imam_ai.ui.theme.Imam_aiTheme
 import com.nurtore.imam_ai.utils.SharedPrefs
+import java.util.Calendar
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
-    private val db by lazy {
+    private val messagesDb by lazy {
         Room.databaseBuilder(
             applicationContext,
             DbMessageWithImamDatabase::class.java,
@@ -39,17 +41,24 @@ class MainActivity : ComponentActivity() {
         ).build()
     }
 
+    private val scheduleDb by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            ScheduleDatabase::class.java,
+            "schedule.db"
+        ).build()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             Imam_aiTheme {
                 // A surface container using the 'background' color from the theme
 
                 val prefs = SharedPrefs(this)
-
                 val repo = Repo()
-                val viewModelFactoryImamChat = ImamChatViewModelFactory(repo, db.dao, application)
+                val viewModelFactoryImamChat = ImamChatViewModelFactory(repo, messagesDb.dao, application)
                 val viewmodelImamChat =
                     ViewModelProvider(this, viewModelFactoryImamChat).get(ImamChatViewModel::class.java)
 //                runBlocking {
@@ -62,7 +71,8 @@ class MainActivity : ComponentActivity() {
 
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                 val geocoder = Geocoder(this, Locale.getDefault())
-                val homePageViewModelFactory = HomePageViewModelFactory(fusedLocationClient, geocoder)
+                val calendar = Calendar.getInstance()
+                val homePageViewModelFactory = HomePageViewModelFactory(fusedLocationClient, geocoder, repo, calendar, scheduleDb.dao)
                 val homePageViewModel: HomePageViewModel = ViewModelProvider(this, homePageViewModelFactory).get(HomePageViewModel::class.java)
 
                 Surface(

@@ -1,4 +1,4 @@
-package com.nurtore.imam_ai.model
+package com.nurtore.imam_ai.db.messages
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

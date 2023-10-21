@@ -22,6 +22,9 @@ import androidx.navigation.NavHostController
 import com.nurtore.imam_ai.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalContext
+import com.nurtore.imam_ai.notifications.schedulePrayerNotifications
+import com.nurtore.imam_ai.notifications.showPrayerNotification
 
 
 //Welcome! I am your personal Imam. I can answer any questions about Islam, Quran, Hadith, Islamic culture and history. What question interests you today?
@@ -64,6 +67,13 @@ fun HomePageScreen(navController: NavHostController, homePageViewModel: HomePage
 
         locationData?.let {
             Text("City: ${it.city}, Country: ${it.country}")
+            //Text(text = homePageViewModel.testConnection())
+        }
+
+        val context = LocalContext.current
+
+        Button(onClick = { homePageViewModel.fetchPrayerSchedule() }) {
+            Text(text = "test")
         }
 
     }

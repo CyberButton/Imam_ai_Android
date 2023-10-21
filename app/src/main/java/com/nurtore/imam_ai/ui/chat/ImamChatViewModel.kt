@@ -12,9 +12,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.nurtore.imam_ai.api.Repo
-import com.nurtore.imam_ai.db.DbMessageWithImamDao
-import com.nurtore.imam_ai.model.ChatId
-import com.nurtore.imam_ai.model.DbMessageWithImam
+import com.nurtore.imam_ai.db.messages.DbMessageWithImamDao
+import com.nurtore.imam_ai.db.messages.ChatId
+import com.nurtore.imam_ai.db.messages.DbMessageWithImam
 import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.model.Question
 import com.nurtore.imam_ai.utils.isOnline

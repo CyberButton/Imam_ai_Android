@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.nurtore.imam_ai.api.Repo
-import com.nurtore.imam_ai.db.DbMessageWithImamDao
+import com.nurtore.imam_ai.db.messages.DbMessageWithImamDao
 
 class ImamChatViewModelFactory(
     private val repo: Repo,

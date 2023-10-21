@@ -2,6 +2,7 @@ package com.nurtore.imam_ai.api
 
 import com.nurtore.imam_ai.model.MessageWithImam
 import com.nurtore.imam_ai.model.Question
+import com.nurtore.imam_ai.model.prayerApiResponse.PrayerTimeResponse
 import retrofit2.Response
 
 class Repo {
@@ -18,4 +19,7 @@ class Repo {
         return RetrofitInstance.api.getMessagesList(chatId)
     }
 
+    suspend fun getPrayerSchedule(url: String): Response<PrayerTimeResponse> {
+        return RetrofitInstance.api.getPrayerSchedule(url)
+    }
 }
