@@ -11,7 +11,10 @@ interface ScheduleDao {
     @Query("SELECT * FROM prayer_times WHERE date = :date")
     suspend fun getPrayerTimesByDate(date: String): PrayerTime
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertPrayerTimes(prayerTimes: PrayerTime)
+
+    @Query("DELETE FROM prayer_times")
+    suspend fun deleteAllSchedules()
 
 }

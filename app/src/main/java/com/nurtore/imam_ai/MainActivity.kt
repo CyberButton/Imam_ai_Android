@@ -18,7 +18,6 @@ import com.google.android.gms.location.LocationServices
 import com.nurtore.imam_ai.api.Repo
 import com.nurtore.imam_ai.db.messages.DbMessageWithImamDatabase
 import com.nurtore.imam_ai.db.schedule.ScheduleDatabase
-import com.nurtore.imam_ai.notifications.schedulePrayerNotifications
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModelFactory
 import com.nurtore.imam_ai.ui.homepage.HomePageViewModel
@@ -34,19 +33,11 @@ import java.util.Locale
 class MainActivity : ComponentActivity() {
 
     private val messagesDb by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            DbMessageWithImamDatabase::class.java,
-            "messages.db"
-        ).build()
+        DbMessageWithImamDatabase.getDatabase(this)
     }
 
     private val scheduleDb by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            ScheduleDatabase::class.java,
-            "schedule.db"
-        ).build()
+        ScheduleDatabase.getDatabase(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
 
                 val prefs = SharedPrefs(this)
+
                 val repo = Repo()
                 val viewModelFactoryImamChat = ImamChatViewModelFactory(repo, messagesDb.dao, application)
                 val viewmodelImamChat =
@@ -72,7 +64,7 @@ class MainActivity : ComponentActivity() {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                 val geocoder = Geocoder(this, Locale.getDefault())
                 val calendar = Calendar.getInstance()
-                val homePageViewModelFactory = HomePageViewModelFactory(fusedLocationClient, geocoder, repo, calendar, scheduleDb.dao)
+                val homePageViewModelFactory = HomePageViewModelFactory(fusedLocationClient, geocoder, repo, calendar, scheduleDb.dao, prefs)
                 val homePageViewModel: HomePageViewModel = ViewModelProvider(this, homePageViewModelFactory).get(HomePageViewModel::class.java)
 
                 Surface(
