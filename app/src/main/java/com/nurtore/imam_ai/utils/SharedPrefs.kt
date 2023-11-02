@@ -23,4 +23,19 @@ class SharedPrefs(context: Context) {
         get() = preferences.getString(LOCATION_COUNTRY, null)
         set(value) = preferences.edit().putString(LOCATION_COUNTRY, value).apply()
 
+    private val LATITUDE: String = "latitude"
+    var latitude: String?
+        get() = preferences.getString(LATITUDE, null)
+        set(value) = preferences.edit().putString(LATITUDE, value).apply()
+
+    private val LONGITUDE: String = "latitude"
+    var longitude: String?
+        get() = preferences.getString(LONGITUDE, null)
+        set(value) = preferences.edit().putString(LONGITUDE, value).apply()
+
+    private val FIRST_LAUCNH: String = "first_launch"
+    var first_launch: Boolean
+        get() = preferences.getBoolean(FIRST_LAUCNH, true)
+        set(value) = preferences.edit().putBoolean(FIRST_LAUCNH, value).apply()
+
 }

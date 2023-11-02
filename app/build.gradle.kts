@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nurtore.imam_ai"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -116,5 +116,8 @@ dependencies {
 
     // For notifications
     implementation("androidx.core:core-ktx:1.7.0") // Use the latest version
+
+    // location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
 }

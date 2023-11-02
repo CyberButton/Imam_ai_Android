@@ -20,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 import com.nurtore.imam_ai.ui.homepage.HomePageViewModel
+import com.nurtore.imam_ai.ui.kibla.KiblaSearchViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,8 +28,9 @@ import com.nurtore.imam_ai.ui.homepage.HomePageViewModel
 @Composable
 fun MainScreen(
     imamChatViewModel: ImamChatViewModel,
-    compassDegree: Float,
-    homePageViewModel: HomePageViewModel
+    homePageViewModel: HomePageViewModel,
+    kiblaSearchViewModel: KiblaSearchViewModel,
+    askForLocationPermission: () -> Unit
 ) {
     val navController = rememberNavController()
     Scaffold(
@@ -39,8 +41,9 @@ fun MainScreen(
         BottomNavGraph(
             navController = navController,
             imamChatViewModel = imamChatViewModel,
-            compassDegree = compassDegree,
-            homePageViewModel = homePageViewModel
+            homePageViewModel = homePageViewModel,
+            kiblaSearchViewModel = kiblaSearchViewModel,
+            askForLocationPermission
             )
     }
 }

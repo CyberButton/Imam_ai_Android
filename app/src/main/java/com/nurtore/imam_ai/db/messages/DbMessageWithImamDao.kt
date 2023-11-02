@@ -8,7 +8,7 @@ import androidx.room.Query
 @Dao
 interface DbMessageWithImamDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addMessage(dbMessageWithImam: DbMessageWithImam)
 
     @Query("DELETE FROM dbmessagewithimam")

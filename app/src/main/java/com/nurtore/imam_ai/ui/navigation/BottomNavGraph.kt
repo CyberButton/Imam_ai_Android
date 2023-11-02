@@ -9,23 +9,26 @@ import com.nurtore.imam_ai.ui.chat.ImamChatViewModel
 import com.nurtore.imam_ai.ui.homepage.HomePageScreen
 import com.nurtore.imam_ai.ui.homepage.HomePageViewModel
 import com.nurtore.imam_ai.ui.kibla.KiblaSearchScreen
+import com.nurtore.imam_ai.ui.kibla.KiblaSearchViewModel
 
 
 @Composable
 fun BottomNavGraph(
     navController: NavHostController,
     imamChatViewModel: ImamChatViewModel,
-    compassDegree: Float,
-    homePageViewModel: HomePageViewModel
+    homePageViewModel: HomePageViewModel,
+    kiblaSearchViewModel: KiblaSearchViewModel,
+    askForLocationPermission: () -> Unit
 ) {
     NavHost(
         navController = navController,
-        startDestination = BottomBar.Home.route
+        startDestination = BottomBar.Chat.route
     ) {
         composable(route = BottomBar.Home.route) {
             HomePageScreen(
                 navController,
-                homePageViewModel
+                homePageViewModel,
+                askForLocationPermission
             )
         }
         composable(route = BottomBar.Chat.route) {
@@ -35,7 +38,8 @@ fun BottomNavGraph(
         }
         composable(route = BottomBar.Kibla.route) {
             KiblaSearchScreen(
-                compassDegree
+                askForLocationPermission,
+                kiblaSearchViewModel
             )
         }
     }

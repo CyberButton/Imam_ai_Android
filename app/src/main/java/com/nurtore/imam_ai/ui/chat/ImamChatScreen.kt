@@ -124,7 +124,7 @@ fun ImamChatScreen(
                 LoadingAnimation()
             }
             else -> {
-                LazyColumn(
+                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -160,9 +160,12 @@ fun ImamChatScreen(
                 }
 
                 LaunchedEffect(scrollState.value) {
-                        delay(750)
-                        listState.animateScrollToItem(index = listState.layoutInfo.totalItemsCount - 1)
-                    println("triggered auto Scroll from launchedEffect")
+                    delay(750)
+                    val targetIndex = listState.layoutInfo.totalItemsCount - 1
+                    if (targetIndex >= 0) { // Check if the target index is non-negative
+                        listState.animateScrollToItem(index = targetIndex)
+                        println("triggered auto Scroll from launchedEffect")
+                    }
                     }
 
                 Row(
